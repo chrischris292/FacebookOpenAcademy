@@ -42,6 +42,19 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
   }
 
   private def allPhraseandInterests(sc: SparkContext): Seq[String] = {
+    //read interest categories
+    val categories = Storage.getPEvents().find(appId = dsp.appId, entityType = Some("categories"))(sc)
+
+    categories.map { event =>
+      val category = event.properties.get[String]("category")
+      val categoryIndex = event.properties.get[String]("categoryIndex")
+
+      s"$phrase $Interest"
+    }.collect().toSeq
+
+
+
+    //original
     val events = Storage.getPEvents().find(appId = dsp.appId, entityType = Some("phrase"))(sc)
 
     events.map { event =>
@@ -50,6 +63,8 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
 
       s"$phrase $Interest"
     }.collect().toSeq
+
+
   }
 
   private def phraseAndInterestToTrainingData(phraseAndInterests: Seq[String]) = {

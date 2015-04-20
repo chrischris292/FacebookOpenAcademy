@@ -1,20 +1,105 @@
 import predictionio
 import argparse
+import simplejson
+import json
+import pprint
+import json
+import bson
+from bson import Binary, Code
+from bson.json_util import loads
+import re
+import codecs
+
+categories = [];
+def __unicode__(self):
+   return unicode(self.some_field) or u''
 
 def sendData(args):
     # A user rates an item
     USER_ID = ""
     ITEM_ID = ""
+    interestCounter = 0;
+
     client = predictionio.EventClient(
         access_key=args.access_key,
         url=args.url,
         threads=5,
         qsize=500
     )
-    file = open(args.file, "r")
+    file = codecs.open(args.file, "r",encoding='utf-8')
     line = file.readline();
     counter = 1;
-    
+    jsonStr = "";
+    while line !="":
+      while line !="\n":
+        #cite from http://stackoverflow.com/questions/11867538/how-can-i-use-python-to-transform-mongodbs-bsondump-into-json
+        #remove all objectID wrappers
+        line = re.sub(r'ObjectId\s*\(\s*\"(\S+)\"\s*\)',
+                      r'{"$oid": "\1"}',
+                      line)
+
+        #remove all ISODate wrappers
+        line = re.sub(r'ISODate\s*\(\s*(\S+)\s*\)',
+                      r'{"$date": \1}',
+                      line)
+
+        jsonStr +=line;
+
+        line = file.readline();
+
+      if line== "\n":
+        jsonCount = file.readline();
+        #Load JSON Obj
+        if counter != 1:
+          jsonTemp = loads(jsonStr)
+          id = jsonTemp["_id"];
+          id = jsonTemp["_id"];
+          for i in jsonTemp["adgroup"]["targeting"]["interests"]:
+            adInterests = [];
+            if i["name"] not in categories:
+              #read through each interest and get UNIQUE interests
+              categories.append(i["name"])
+              
+              client.create_event(
+              event="$set",
+              entity_type="categories",
+              entity_id=interestCounter,
+              properties= { "category" :str(i["name"].encode(encoding='utf8')),
+                            "categoryIndex" : interestCounter
+                }
+              )
+
+
+              
+              adInterests.append(i["name"])
+              interestCounter +=1;
+              print i["name"]
+          descriptionTemp = jsonTemp["description"];
+          messageTemp = jsonTemp["message"] 
+          if(jsonTemp["description"]==None):
+            descriptionTemp = ""
+          if(jsonTemp["message"]==None):
+            messageTemp = ""
+          phrase =  descriptionTemp + " " +  messageTemp;
+          #Read through each interest and create event
+          for interest in adInterests:
+            response = client.create_event(
+            event="$set",
+            entity_type="phrase",
+            entity_id=jsonTemp["adgroup"]["id"],
+            properties= { "phrase" : phrase.encode(encoding='utf8'),
+                         "Interest" : interest
+            }
+            )
+
+          #Clear jsonStr when finished loading JSON Object
+        jsonStr = ""
+        counter +=1;
+        line = file.readline();
+
+    print "done"
+
+    """
     while line!="": 
       line = line.split(" ");
       interest =  str(" ".join(line[len(line)-1]).replace("\n","").replace(" ",""));
@@ -33,12 +118,13 @@ def sendData(args):
       #Read New Line
       counter = counter + 1;
       line = file.readline();
+      """
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
     description="Import sample data for classification engine")
   parser.add_argument('--access_key', default='invald_access_key')
   parser.add_argument('--url', default="http://localhost:7070")
-  parser.add_argument('--file', default="train.txt")
+  parser.add_argument('--file', default="data.json")
 
   args = parser.parse_args()
   print args
