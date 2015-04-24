@@ -54,26 +54,9 @@ def sendData(args):
           jsonTemp = loads(jsonStr)
           id = jsonTemp["_id"];
           id = jsonTemp["_id"];
+          adInterests = [];
           for i in jsonTemp["adgroup"]["targeting"]["interests"]:
-            adInterests = [];
-            if i["name"] not in categories:
-              #read through each interest and get UNIQUE interests
-              categories.append(i["name"])
-              
-              client.create_event(
-              event="$set",
-              entity_type="categories",
-              entity_id=interestCounter,
-              properties= { "category" :str(i["name"].encode(encoding='utf8')),
-                            "categoryIndex" : interestCounter
-                }
-              )
-
-
-              
-              adInterests.append(i["name"])
-              interestCounter +=1;
-              print i["name"]
+            adInterests.append(i["name"])
           descriptionTemp = jsonTemp["description"];
           messageTemp = jsonTemp["message"] 
           if(jsonTemp["description"]==None):
@@ -83,6 +66,9 @@ def sendData(args):
           phrase =  descriptionTemp + " " +  messageTemp;
           #Read through each interest and create event
           for interest in adInterests:
+            print interest
+            print phrase
+            
             response = client.create_event(
             event="$set",
             entity_type="phrase",
@@ -91,7 +77,7 @@ def sendData(args):
                          "Interest" : interest
             }
             )
-
+            
           #Clear jsonStr when finished loading JSON Object
         jsonStr = ""
         counter +=1;

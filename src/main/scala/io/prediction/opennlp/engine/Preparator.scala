@@ -6,7 +6,9 @@ import org.apache.spark.SparkContext
 class Preparator extends PPreparator[TrainingData, PreparedData] {
 
   def prepare(sc: SparkContext, trainingData: TrainingData): PreparedData = {
+    //PreparedData(trainingData.dataIndexer, trainingData.map)
     PreparedData(trainingData.dataIndexer)
+
   }
 }
 

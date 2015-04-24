@@ -23,23 +23,18 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
   override def readTraining(sc: SparkContext): TrainingData = {
     val trainingTreeStrings = allPhraseandInterests(sc)
     val categories = Storage.getPEvents().find(appId = dsp.appId, entityType = Some("categories"))(sc)
-    val categoriesArr = categories.map { event =>
+    /*val categoriesArr = categories.map { event =>
       val category = event.properties.get[String]("category")
       val categoryIndex = event.properties.get[Integer]("categoryIndex")
-      println(category + " " + categoryIndex)
       (categoryIndex,category)
     }.collect()
-    val categoriesMap = categoriesArr.groupBy(_._1).mapValues(_.map(_._2.toString()))
-    println("start")
-    println(categoriesMap)
-    println(categoriesMap.get(62).toString().toString)
-    println(categoriesMap.get(157).toString())
-    println(categoriesMap.get(351).toString())
-    println(categoriesMap.get(182).toString())
-    println(categoriesMap.get(276).toString())
-    println(categoriesMap.get(263).toString())
+    var categoriesMap = scala.collection.mutable.Map[Integer, String]()
+    var it = 0;
+    for(it <- 0 to categoriesArr.length-1){
+          categoriesMap += (categoriesArr(it)._1 -> categoriesArr(it)._2)
+    }*/
 
-    phraseAndInterestToTrainingData(trainingTreeStrings)
+    TrainingData(phraseAndInterestToTrainingData(trainingTreeStrings))//,categoriesMap)
   }
 /*
   override def readEval(
@@ -67,6 +62,7 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
     events.map { event =>
       val phrase = event.properties.get[String]("phrase")
       val Interest = event.properties.get[String]("Interest")
+      println(phrase + " "  + Interest)
       s"$phrase $Interest"
     }.collect().toSeq
 
@@ -78,6 +74,6 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
     val eventStream = new BasicEventStream(new SeqDataStream(phraseAndInterests), Separator)
     val dataIndexer = new OnePassDataIndexer(eventStream, dsp.cutoff)
 
-    TrainingData(dataIndexer)
+    dataIndexer
   }
 }

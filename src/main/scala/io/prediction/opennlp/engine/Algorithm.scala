@@ -11,15 +11,15 @@ class Algorithm(val ap: AlgorithmParams)
   extends P2LAlgorithm[PreparedData, Model, Query, PredictedResult] {
 
   def train(sc: SparkContext, data: PreparedData): Model = {
-    println(data.dataIndexer)
-    Model(GIS.trainModel(ap.iteration, data.dataIndexer, ap.smoothing))
+    //Model(GIS.trainModel(ap.iteration, data.dataIndexer, ap.smoothing), data.map)
+   Model(GIS.trainModel(ap.iteration, data.dataIndexer, ap.smoothing))
+
   }
 
   def predict(model: Model, query: Query): PredictedResult = {
-    val interest = Interest(
-      model.gis.getBestOutcome(model.gis.eval(query.sentence.split(" "))).toInt
-    )
-    PredictedResult(interest.toString)
+    
+    val interest = model.gis.getBestOutcome(model.gis.eval(query.sentence.split(" ")))
+    PredictedResult(interest)
   }
 
   override def batchPredict(model: Model, qs: RDD[(Long, Query)]): RDD[(Long, PredictedResult)] = {
