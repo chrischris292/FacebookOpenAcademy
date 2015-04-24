@@ -7,6 +7,8 @@ import opennlp.maxent.BasicEventStream
 import opennlp.model.OnePassDataIndexer
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
+import io.prediction.data.storage.DataMap
+import Array._
 
 import scala.util.Random
 
@@ -20,9 +22,26 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
 
   override def readTraining(sc: SparkContext): TrainingData = {
     val trainingTreeStrings = allPhraseandInterests(sc)
+    val categories = Storage.getPEvents().find(appId = dsp.appId, entityType = Some("categories"))(sc)
+    val categoriesArr = categories.map { event =>
+      val category = event.properties.get[String]("category")
+      val categoryIndex = event.properties.get[Integer]("categoryIndex")
+      println(category + " " + categoryIndex)
+      (categoryIndex,category)
+    }.collect()
+    val categoriesMap = categoriesArr.groupBy(_._1).mapValues(_.map(_._2.toString()))
+    println("start")
+    println(categoriesMap)
+    println(categoriesMap.get(62).toString().toString)
+    println(categoriesMap.get(157).toString())
+    println(categoriesMap.get(351).toString())
+    println(categoriesMap.get(182).toString())
+    println(categoriesMap.get(276).toString())
+    println(categoriesMap.get(263).toString())
+
     phraseAndInterestToTrainingData(trainingTreeStrings)
   }
-
+/*
   override def readEval(
     sc: SparkContext): Seq[(TrainingData, EmptyEvaluationInfo, RDD[(Query, Interest)])] = {
     val shuffled = Random.shuffle(allPhraseandInterests(sc))
@@ -33,34 +52,21 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
 
     val qna = testingSet.map { line =>
       val lastSpace = line.lastIndexOf(Separator)
-      println("MAP")
-      println(Interest(line.substring(lastSpace + 1).toInt))
-
       (Query(line.substring(0, lastSpace)), Interest(line.substring(lastSpace + 1).toInt))
     }
-    Seq((trainingData, EmptyParams(), sc.parallelize(qna)))
-  }
+    Seq((trainingData, EmptyParams() , sc.parallelize(qna)))
+  }*/
 
   private def allPhraseandInterests(sc: SparkContext): Seq[String] = {
-    //read interest categories
-    val categories = Storage.getPEvents().find(appId = dsp.appId, entityType = Some("categories"))(sc)
-
-    categories.map { event =>
-      val category = event.properties.get[String]("category")
-      val categoryIndex = event.properties.get[String]("categoryIndex")
-
-      s"$phrase $Interest"
-    }.collect().toSeq
-
-
 
     //original
     val events = Storage.getPEvents().find(appId = dsp.appId, entityType = Some("phrase"))(sc)
 
+    //added
+
     events.map { event =>
       val phrase = event.properties.get[String]("phrase")
       val Interest = event.properties.get[String]("Interest")
-
       s"$phrase $Interest"
     }.collect().toSeq
 
@@ -68,6 +74,7 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
   }
 
   private def phraseAndInterestToTrainingData(phraseAndInterests: Seq[String]) = {
+
     val eventStream = new BasicEventStream(new SeqDataStream(phraseAndInterests), Separator)
     val dataIndexer = new OnePassDataIndexer(eventStream, dsp.cutoff)
 
