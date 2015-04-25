@@ -11,29 +11,5 @@ import opennlp.maxent.io.SuffixSensitiveGISModelWriter
 import opennlp.model.AbstractModel
 import opennlp.model.PlainTextFileDataReader
 import org.apache.spark.SparkContext
-import scala.collection.Map
 
-//case class Model(gis: AbstractModel, map: Map[Integer, String]) //extends IPersistentModel[AlgorithmParams] with Serializable {
-case class Model(gis: AbstractModel) //extends IPersistentModel[AlgorithmParams] with Serializable {
-
-/*
-  override def save(id: String, params: AlgorithmParams, sc: SparkContext): Boolean = {
-    val writer = new SuffixSensitiveGISModelWriter(gis, new File(s"/tmp/gis-$id"))
-    writer.persist()
-
-    false
-  }*/
-//}
-/*
-object Model extends IPersistentModelLoader[AlgorithmParams, Model] {
-
-
-  override def apply(id: String, params: AlgorithmParams, sc: Option[SparkContext]): Model = {
-
-    val inputStream = new FileInputStream(new File(s"/tmp/gis-$id"))
-    val modelReader = new PlainTextFileDataReader(inputStream)
-    val gis = new GISModelReader(modelReader).getModel
-
-    Model(gis)
-  }
-}*/
+case class Model(gis: AbstractModel)

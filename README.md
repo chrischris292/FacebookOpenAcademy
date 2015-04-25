@@ -5,6 +5,8 @@ This engine template has integrated OpenNLP's GISModel for text classification.
 ### Overview
 This engine template utilizes the GIS algorithm from the Apache OpenNLP library to classify text based off of training data. 
 
+Training data in this example is taken from Ana Cardoso-Cachopo, Improving Methods for Single-label Text Categorization, PhD Thesis, October, 2007.
+
 ## Versions
 
 ### v0.1.0

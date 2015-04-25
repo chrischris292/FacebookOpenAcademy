@@ -11,7 +11,6 @@ class Algorithm(val ap: AlgorithmParams)
   extends P2LAlgorithm[PreparedData, Model, Query, PredictedResult] {
 
   def train(sc: SparkContext, data: PreparedData): Model = {
-    //Model(GIS.trainModel(ap.iteration, data.dataIndexer, ap.smoothing), data.map)
    Model(GIS.trainModel(ap.iteration, data.dataIndexer, ap.smoothing))
 
   }

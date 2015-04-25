@@ -42,7 +42,7 @@ def sendData(args):
         line = re.sub(r'ISODate\s*\(\s*(\S+)\s*\)',
                       r'{"$date": \1}',
                       line)
-
+        
         jsonStr +=line;
 
         line = file.readline();
@@ -85,26 +85,6 @@ def sendData(args):
 
     print "done"
 
-    """
-    while line!="": 
-      line = line.split(" ");
-      interest =  str(" ".join(line[len(line)-1]).replace("\n","").replace(" ",""));
-      subString =  str(" ".join(line[0:len(line)-1]));      
-      response = client.create_event(
-          event="$set",
-          entity_type="phrase",
-          entity_id=counter,
-          properties= { "phrase" : subString,
-                        "Interest" : interest
-          }
-      )
-      print response
-      print counter;
-      
-      #Read New Line
-      counter = counter + 1;
-      line = file.readline();
-      """
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
     description="Import sample data for classification engine")
