@@ -15,16 +15,17 @@ def sendData(args):
     counter = 1;
     jsonStr = "";
     while line !="":
-      line = line.split(" ") #Split by tab [sentence,category]
+      line = line.split("\t") #Split by tab [sentence,category]
       response = client.create_event(
         event="$set",
         entity_type="phrase",
         entity_id=counter,
-        properties= { "phrase" : line[0],
-                     "Interest" : line[1]
+        properties= { "phrase" : line[1],
+                     "Interest" : line[0]
         }
       )
       counter+=1;
+      line = file.readline();
 
     print str(counter) + " lines have been processed"
 

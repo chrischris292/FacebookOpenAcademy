@@ -2,7 +2,6 @@ package io.prediction.opennlp.engine
 
 import io.prediction.controller.{EmptyEvaluationInfo, EmptyParams, PDataSource}
 import io.prediction.data.storage.Storage
-import io.prediction.opennlp.engine.Interest.Interest
 import opennlp.maxent.BasicEventStream
 import opennlp.model.OnePassDataIndexer
 import org.apache.spark.SparkContext
@@ -16,7 +15,7 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
   TrainingData,
   EmptyEvaluationInfo,
   Query,
-  Interest] {
+  String] {
 
   val Separator = " "
 
@@ -31,7 +30,6 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
     events.map { event =>
       val phrase = event.properties.get[String]("phrase")
       val Interest = event.properties.get[String]("Interest")
-      println(phrase + " "  + Interest)
       s"$phrase $Interest"
     }.collect().toSeq
 
