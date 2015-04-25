@@ -23,7 +23,7 @@ This engine template utilizes the GIS algorithm from the Apache OpenNLP library 
 
 **Dataset Format**
 Training Data:
-Your training data should be a single line with a sentence and a category seperated by a space. *Note that all words should have a single space between them.
+Your training data should be a single line with a sentence and a category seperated by a tab. *Note that all words should have a single space between them.
 For example,
 ```
 Russell Wilson is a super bowl quarterback	Sports	
