@@ -70,12 +70,12 @@ def sendData(args):
             print phrase
             
             response = client.create_event(
-            event="$set",
-            entity_type="phrase",
-            entity_id=jsonTemp["adgroup"]["id"],
-            properties= { "phrase" : phrase.encode(encoding='utf8'),
-                         "Interest" : interest
-            }
+              event="$set",
+              entity_type="phrase",
+              entity_id=jsonTemp["adgroup"]["id"],
+              properties= { "phrase" : phrase.encode(encoding='utf8'),
+                           "Interest" : interest
+              }
             )
             
           #Clear jsonStr when finished loading JSON Object
