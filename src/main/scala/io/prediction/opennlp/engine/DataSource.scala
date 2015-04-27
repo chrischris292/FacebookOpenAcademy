@@ -17,7 +17,7 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
   Query,
   String] {
 
-  val Separator = "  "
+  val Separator = " "
 
   override def readTraining(sc: SparkContext): TrainingData = {
     val trainingTreeStrings = allPhraseandInterests(sc)
@@ -29,8 +29,9 @@ class DataSource(val dsp: DataSourceParams) extends PDataSource[
 
     events.map { event =>
       val phrase = event.properties.get[String]("phrase")
-      val Interest = event.properties.get[String]("Interest")
-      s"$phrase  $Interest"
+      val Interest = event.properties.get[String]("Interest").replace(" ","_")
+      val string = phrase + Separator + Interest; 
+      string
     }.collect().toSeq
 
 
